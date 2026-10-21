@@ -24,4 +24,24 @@ public class MembersController(AppDBContext context) : BaseApiController
         if (member == null) return NotFound();
         return member;
     }
+
+    [HttpDelete("{id}")] //localhost:5001/api/members/cosmin-id
+    public async Task<ActionResult> DeleteMember(string id)
+    {
+        var member = await context.Users.FindAsync(id);
+        if (member == null) return NotFound();
+        context.Users.Remove(member);
+        await context.SaveChangesAsync();
+        return Ok($"{member.DisplayName} was deleted");
+    }
+
+    [HttpDelete] //localhost:5001/api/members
+    public async Task<ActionResult> DeleteAllMembers()
+    {
+        var members = await context.Users.ToListAsync();
+        if (members.Count == 0) return NotFound();
+        context.Users.RemoveRange(members);
+        await context.SaveChangesAsync();
+        return Ok($"{members.Count} members were deleted");
+    }
 }
